@@ -27,10 +27,22 @@ public class FilmeRepository : IFilmeRepository
         throw new NotImplementedException();
     }
 
-    public Task<FilmeResponse> BuscarFilmeAsync(int id)
+    public async Task<FilmeResponse> BuscarFilmeAsync(int id)
     {
-        string sql = @"";
-        throw new NotImplementedException();
+        string sql = @"SELECT filmeId	as FilmeId,
+	                f.nome	as Nome, 
+	                f.ano	as Ano,
+	                p.nome	as Produtora
+                    FROM tb_filme as f (nolock)
+                    INNER JOIN tb_produtora as p (nolock)
+                    on f.produtoraId = p.produtoraId
+                    WHERE f.filmedId = @Id";
+
+
+        using (var con = new SqlConnection(connectionString))
+        {
+            return await con.QueryFirstOrDefaultAsync<FilmeResponse>(sql, new {Id = id});
+        }
     }
 
     public async Task<IEnumerable<FilmeResponse>> BuscarFilmesAsync()
@@ -38,7 +50,7 @@ public class FilmeRepository : IFilmeRepository
         string sql = @"SELECT filmeId	as FilmeId,
 	                f.nome	as Nome, 
 	                f.ano	as Ano,
-	                p.nome	as Nomeprodutora
+	                p.nome	as Produtora
                     FROM tb_filme as f (nolock)
                     INNER JOIN tb_produtora as p (nolock)
                     on f.produtoraId = p.produtoraId";
