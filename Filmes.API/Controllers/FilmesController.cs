@@ -1,4 +1,5 @@
-﻿using Filmes.API.Repository;
+﻿using Filmes.API.Models;
+using Filmes.API.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,5 +45,64 @@ public class FilmesController : ControllerBase
             : NotFound("Filme não encontrado");
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Post(FilmeRequest request)
+    {
+        if (string.IsNullOrEmpty(request.Nome) || request.Ano <=0 || request.ProdutoraId<=0)
+        {
+            return BadRequest("Informações inváldas");
+        }
+        var adicionado = await _filmeRepository.AdicionarAsync(request);
+        return adicionado
+            ? Ok("Filme adicionado com sucesso")
+            : BadRequest("Erro ao adicionar filme");
+
+    }
+
+    [HttpPut("id")]
+    public async Task<IActionResult> Put(FilmeRequest request, int id)
+    {
+        if (id <=0)
+        {
+            return BadRequest("Filme inválido");
+        }
+
+        var filme = await _filmeRepository.BuscarFilmeAsync(id);
+        if (filme == null)
+            return  NotFound("Filme não encontrado");
+
+
+        if (string.IsNullOrEmpty(request.Nome) || request.Ano <= 0 || request.ProdutoraId <= 0)
+        {
+            return BadRequest("Informações inváldas");
+        }
+        var atualizado = await _filmeRepository.AtualizarAsync(request, id);
+        return atualizado
+
+            ? Ok("Filme atualizado com sucesso")
+            : BadRequest("Erro ao atualizar filme");
+
+    }
+
+    [HttpDelete("id")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        if (id <= 0)
+        {
+            return BadRequest("Filme inválido");
+        }
+
+        var filme = await _filmeRepository.BuscarFilmeAsync(id);
+        if (filme == null)
+            return NotFound("Filme não encontrado");
+
+              
+        var deleteado = await _filmeRepository.DeletarAsync(id);
+        return deleteado
+
+            ? Ok("Filme removido com sucesso")
+            : BadRequest("Erro ao remover filme");
+
+    }
 
 }

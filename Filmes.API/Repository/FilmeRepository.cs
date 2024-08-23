@@ -17,26 +17,49 @@ public class FilmeRepository : IFilmeRepository
 
     public IConfiguration Configuration { get; }
 
-    public Task<bool> AdicionarAsync(FilmeRequest request)
+    public async Task<bool> AdicionarAsync(FilmeRequest request)
     {
-        throw new NotImplementedException();
+        string @sql = @"INSERT INTO tb_filme(nome,ano,ProdutoraId) 
+                       VALUES (@Nome, @Ano,@ProdutoraId)";
+
+
+        using (var con = new SqlConnection(connectionString))
+        {
+            return await con.ExecuteAsync(sql, request) > 0;
+        }
+
     }
 
-    public Task<bool> AtualizarAsync(FilmeRequest request, int id)
+    public async Task<bool> AtualizarAsync(FilmeRequest request, int id)
     {
-        throw new NotImplementedException();
+        string @sql = @"UPDATE tb_filme 
+                        SET nome = @Nome,
+                            ano = @Ano,
+                            produtoraId = @ProdutoraId
+                        WHERE filmeId = @Id";
+
+        var parametros = new DynamicParameters();
+        parametros.Add("Ano", request.Ano);
+        parametros.Add("Nome", request.Nome);
+        parametros.Add("ProdutoraId", request.ProdutoraId);
+
+        parametros.Add("Id", id);
+        using (var con = new SqlConnection(connectionString))
+        {
+            return await con.ExecuteAsync(sql, parametros) > 0;
+        }
     }
 
     public async Task<FilmeResponse> BuscarFilmeAsync(int id)
     {
-        string sql = @"SELECT filmeId	as FilmeId,
+        string sql = @"SELECT f.filmeId	as Id,
 	                f.nome	as Nome, 
 	                f.ano	as Ano,
 	                p.nome	as Produtora
                     FROM tb_filme as f (nolock)
                     INNER JOIN tb_produtora as p (nolock)
                     on f.produtoraId = p.produtoraId
-                    WHERE f.filmedId = @Id";
+                    WHERE f.filmeId = @Id";
 
 
         using (var con = new SqlConnection(connectionString))
@@ -47,7 +70,7 @@ public class FilmeRepository : IFilmeRepository
 
     public async Task<IEnumerable<FilmeResponse>> BuscarFilmesAsync()
     {
-        string sql = @"SELECT filmeId	as FilmeId,
+        string sql = @"SELECT filmeId as Id,
 	                f.nome	as Nome, 
 	                f.ano	as Ano,
 	                p.nome	as Produtora
@@ -61,8 +84,13 @@ public class FilmeRepository : IFilmeRepository
         }
     }
 
-    public Task<bool> DeletarAsync(int id)
+    public async Task<bool> DeletarAsync(int id)
     {
-        throw new NotImplementedException();
+        string @sql = @"DELETE FROM tb_filme WHERE filmeId = @Id";
+               
+        using (var con = new SqlConnection(connectionString))
+        {
+            return await con.ExecuteAsync(sql, new { Id = id }) > 0;
+        }
     }
 }
