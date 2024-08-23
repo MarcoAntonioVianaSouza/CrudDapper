@@ -1,4 +1,6 @@
-﻿Para aprender mais sobre DAPPER, visitar.
+﻿Estudo baseado na videoaula:https://www.youtube.com/watch?v=pjPwBKQuseI
+
+Para aprender mais sobre DAPPER, visitar.
 - https://www.learndapper.com/
 
 O DAPPER é um micro ORM criado pela equipe do Stack OverFlow.
